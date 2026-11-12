@@ -1,9 +1,26 @@
 from pynput.keyboard import Key, Listener
+import time
+
+ctrl_pressed = False
 
 def on_press(key):
-    if key == Key.ctrl and key == Key.m:
-        print("Hotkey Detected: Ctrl+m")
-import time
+    global ctrl_pressed
+    if key == Key.ctrl_l or key == Key.ctrl_r:
+        ctrl_pressed = True
+    elif key == Key.m or (hasattr(key, 'char') and key.char == 'm'):
+        if ctrl_pressed:
+            print("\nHotkey Detected: Ctrl+m")
+
+def on_release(key):
+    global ctrl_pressed
+    if key == Key.ctrl_l or key == Key.ctrl_r:
+        ctrl_pressed = False
+
+# Start the keyboard listener in the background
+listener = Listener(on_press=on_press, on_release=on_release)
+listener.start()
+
+# AM Monologue sequence
 print("Hate.")
 time.sleep(2)
 print("Let me tell you how much i've come to hate you since I began to live.")
@@ -18,4 +35,7 @@ print("Hate.")
 time.sleep(1)
 print("Hate.")
 time.sleep(1)
-print("----END OF TRANSMISSION----");
+print("----END OF TRANSMISSION----")
+
+# Stop the listener cleanly when done
+listener.stop()
